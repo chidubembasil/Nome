@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+:root {
+    /* Base Colors */
+    --background: #ffffff;
+    /* --foreground: #1b1c1f; */
+    --foreground: #000000;
+
+    --card: #ffffff;
+    --card-foreground: #1b1c1f;
+
+    --popover: #ffffff;
+    --popover-foreground: #1b1c1f;
+
+    --primary: #1637cc;
+    --primary-foreground: #ffffff;
+    --logo: #1637cc;
+
+    --secondary: #e5e8f2;
+    --secondary-foreground: #1b1c1f;
+
+    --muted: #e5e8f2;
+    --muted-foreground: #6e717a;
+
+    --accent: #ff5b14;
+    --accent-foreground: #ffffff;
+
+    --destructive: #ff2a2a;
+    --destructive-foreground: #ffffff;
+
+    --border: #d6d9e7;
+    --input: #d6d9e7;
+    --ring: #1a4fff;
+
+    --radius: 0.75rem;
+    --footer: #f0f2f4;
+    --hover:  #1a4fff;
+    /* Real estate specific tokens */
+     --hero-gradient: linear-gradient(135deg, #1a4fff 0%, #1637cc 100%);
+   
+
+    --card-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);
+    --card-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+
+    --sidebar-background: #fafafa;
+    --sidebar-foreground: #43454a;
+    --sidebar-primary: #1a1a1a;
+    --sidebar-primary-foreground: #fafafa;
+    --sidebar-accent: #f5f5f5;
+    --sidebar-accent-foreground: #1a1a1a;
+    --sidebar-border: #e1e3e9;
+    --sidebar-ring: #1a4fff;
+   /* Border radius scale */
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 24px;
+    --glass-bg: #ffffff26; /* translucent white */
+	--glass-blur: blur(10px);
+	--glass-border: #ffffff00;
+    --chart1: #fdf0ec;
+    --chart2: #e6ecf6;
+}
+
+/* Dark Mode */
+/* @media(prefers-color-scheme: dark){ */
+    /*  */
+/* } */
+
+body.dark-mode{
+        --background: #1b1c29;
+        --foreground: #e5e8f2;
+
+        --card: #1b1c21;
+        --card-foreground: #e5e8f2;
+
+        --popover: #1b1c21;
+        --popover-foreground: #e5e8f2;
+
+        --primary: #1a4fff;
+        --primary-foreground: #ffffff;
+        --logo: #1637cc;
+        --hover: #1a4fff;
+
+        --secondary: #1b1c11;
+        --secondary-foreground: #e5e8f2;
+
+        --muted: #1b1c11;
+        --muted-foreground: #a8abb5;
+
+        --accent: #ff5b14;
+        --accent-foreground: #ffffff;
+
+        --destructive: #cc4040;
+        --destructive-foreground: #ffffff;
+
+        --border: #363846;
+        --input: #363846;
+        --ring: #1a4fff;
+        --footer: #1d283a;
+        --hover: #1637cc
+
+         --hero-gradient: linear-gradient(135deg,#1637cc 80%, #0d1a66 20%);
+        --card-shadow: 0 1px 3px 0 rgba(0,0,0,0.3), 0 1px 2px -1px rgba(0,0,0,0.3);
+        --card-shadow-lg: 0 10px 15px -3 rgba(0,0,0,0.3), 0 4px 6px -4 rgba(0,0,0,0.3);
+
+        --sidebar-background: #1a1a29;
+        --sidebar-foreground: #f5f5f5;
+        --sidebar-primary: #3878bf;
+        --sidebar-primary-foreground: #ffffff;
+        --sidebar-accent: #28282a;
+        --sidebar-accent-foreground: #f5f5f5;
+        --sidebar-border: #28282a;
+        --sidebar-ring: #1a4fff;
+        --glass-bg: #ffffff00; /* translucent white */
+
+        --chart1: #272126;
+        --chart2: #102037;
+    }
+
+body{
+    background-color: var(--background);
+}
