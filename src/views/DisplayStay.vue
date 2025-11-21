@@ -93,47 +93,89 @@
 </template>
 
 <script setup>
-import { defineComponent, createVNode, ref, onMounted } from 'vue';
+
+import { defineComponent, createVNode, ref, onMounted, onUnmounted } from 'vue';
 import * as LucideIcons from 'lucide-vue-next';
 import axios from 'axios';
+import * as Ably from 'ably'; // ✅ Updated Ably import
 import HeaderView from '@/components/HeaderView.vue';
 import FooterView from '../components/FooterView.vue'
 
-// --- Utility Functions Included ---
+// ICON HANDLER
 const LucideIcon = defineComponent({
   props: { name: { type: String, required: true } },
   render() { 
     const icon = LucideIcons[this.name]; 
-    return icon ? createVNode(icon) : null; 
+    return icon ? createVNode(icon) : null;
   }
 });
 
+// FETCH + REALTIME HOOK
 function usePropertyData(endpoint) {
   const defaultData = {
     images: [], status: {}, specs: {}, description: {}, offers: [], booking: { price: '', breakdown: {} }
   };
-  
+
   const propertyData = ref(defaultData);
   const loading = ref(true);
   const error = ref(null);
 
+  let ablyRealtime = null;
+  let channel = null;
+
   onMounted(async () => {
     try {
+      // FETCH INITIAL DATA
       const response = await axios.get(`http://localhost:3000${endpoint}`);
       propertyData.value = response.data;
       loading.value = false;
+
+      // -----------------------------
+      // ⚡ ABLY REALTIME STARTS HERE
+      // -----------------------------
+      ablyRealtime = new Ably.Realtime({
+        key: 'RSTb1g.Dg9vCg:IYEo1Otd0e1OLvKynv_go5Ma3LvCEa2R1ln7KLwhRk8'
+      });
+   
+
+
+      channel = ablyRealtime.channels.get("vacation-updates");
+
+      // Subscribing to messages
+      channel.subscribe("update", (msg) => {
+        console.log("Received vacation update:", msg.data);
+        propertyData.value = {
+          ...propertyData.value,
+          ...msg.data
+        };
+      });
+
+      console.log("Ably connected and listening for vacation updates...");
+      // -----------------------------
+      // ⚡ ABLY REALTIME ENDS HERE
+      // -----------------------------
+
     } catch (err) {
-      error.value = 'Failed to fetch property data. Check endpoint and server status.';
+      error.value = 'Failed to fetch vacation property data. Check endpoint and server status.';
       console.error('API Error:', err);
       loading.value = false;
     }
   });
+
+  // CLEANUP
+  onUnmounted(() => {
+    if (channel) channel.unsubscribe();
+    if (ablyRealtime) ablyRealtime.close();
+  });
+
   return { propertyData, loading, error };
 }
 
-// --- Page Logic ---
+// USE HOOK
 const { propertyData, loading, error } = usePropertyData('/api/property/vacation');
 </script>
+
+
 
 <style scoped>
 

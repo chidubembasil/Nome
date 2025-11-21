@@ -1,51 +1,108 @@
 <script setup>
-import { reactive } from 'vue';
+  import { reactive, ref, onMounted, onUnmounted } from 'vue';
+  import axios from 'axios';
+  import * as Ably from 'ably'; // ✅ Updated Ably import
 
-const kycData = reactive({
-  verificationStatus: 'Not Verified',
-  isVerified: false,
-  // Legal & Identity
-  ageLegal: false,
-  dateOfBirth: '',
-  ssnOrTaxID: '',
-  idNumber: '',
-  uploadGovIDFront: null,
-  uploadGovIDBack: null,
-  selfieWithID: null,
-  // Property Insurance
-  propertyInsurance: null,
-  // Financial Verification
-  bankName: '',
-  accountType: 'Checking',
-  bankStatement: null,
-  proofOfFunds: null,
-  // Address Verification
-  residenceAddress: '',
-  city: '',
-  state: '',
-  zipCode: '',
-  proofOfAddress: null,
-  // Business Entity
-  legalCompanyName: '',
-  ein: '',
-  entityType: 'LLC',
-  articlesOfIncorporation: null,
-  operatingAgreement: null,
-});
 
-const submitVerification = () => {
-  console.log('Submitting KYC data:', kycData);
-  alert('KYC documents submitted for review. Please check the status later.');
-  kycData.verificationStatus = 'Pending Review';
-};
+  const kycData = reactive({
+    verificationStatus: 'Not Verified',
+    isVerified: false,
+    // Legal & Identity
+    ageLegal: false,
+    dateOfBirth: '',
+    ssnOrTaxID: '',
+    idNumber: '',
+    uploadGovIDFront: null,
+    uploadGovIDBack: null,
+    selfieWithID: null,
+    // Property Insurance
+    propertyInsurance: null,
+    // Financial Verification
+    bankName: '',
+    accountType: 'Checking',
+    bankStatement: null,
+    proofOfFunds: null,
+    // Address Verification
+    residenceAddress: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    proofOfAddress: null,
+    // Business Entity
+    legalCompanyName: '',
+    ein: '',
+    entityType: 'LLC',
+    articlesOfIncorporation: null,
+    operatingAgreement: null,
+  });
 
-const handleFileUpload = (event, field) => {
-  const file = event.target.files[0];
-  if (file) {
-    kycData[field] = file;
-  }
-};
+  // Ably setup
+  let ablyRealtime = null;
+  let channel = null;
+  const ablyStatus = ref('');
+
+  onMounted(() => {
+    ablyRealtime = new Ably.Realtime({
+        key: 'RSTb1g.Dg9vCg:IYEo1Otd0e1OLvKynv_go5Ma3LvCEa2R1ln7KLwhRk8'
+    });
+    channel = ablyRealtime.channels.get('kyc-updates');
+
+    // Subscribe to verification status updates
+    channel.subscribe('status-update', (msg) => {
+      if (msg.data?.status) {
+        kycData.verificationStatus = msg.data.status;
+        ablyStatus.value = `Received update: ${msg.data.status}`;
+      }
+    });
+  });
+
+  onUnmounted(() => {
+    if (channel) channel.unsubscribe();
+    if (ablyRealtime) ablyRealtime.close();
+  });
+
+  // File upload handler
+  const handleFileUpload = (event, field) => {
+    const file = event.target.files[0];
+    if (file) kycData[field] = file;
+  };
+
+  // Submit KYC
+  const submitVerification = async () => {
+    try {
+      // Prepare form data
+      const formData = new FormData();
+      for (const key in kycData) {
+        if (kycData[key] instanceof File) {
+          formData.append(key, kycData[key]);
+        } else {
+          formData.append(key, kycData[key]);
+        }
+      }
+
+      kycData.verificationStatus = 'Pending Review';
+      ablyStatus.value = 'Submitting KYC data...';
+
+      // Send to backend
+      const response = await axios.post('/api/kyc/submit', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      console.log('Server response:', response.data);
+
+      // Publish event to Ably
+      if (channel) {
+        channel.publish('kyc-submitted', { userId: response.data.userId || 'anonymous' });
+      }
+
+      alert('KYC submitted successfully. You will receive real-time updates.');
+    } catch (err) {
+      console.error('KYC submission failed:', err);
+      alert('Failed to submit KYC. Please try again.');
+    }
+  };
 </script>
+
 
 <template>
   <div class="kyc-container">

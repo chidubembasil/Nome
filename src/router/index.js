@@ -66,7 +66,18 @@ const routes = [
     path: '/feed',
     name: 'feed',
     component: () => import(/* webpackChunkName: "feed" */ '../views/NewsFeed.vue')
+  },
+  {
+    path: '/confirm',
+    name: 'confirm',
+    component: () => import(/* webpackChunkName: "confirm" */ '../views/ConfirmView.vue')
+  },
+  {
+    path: '/notification',
+    name: 'notification',
+    component: () => import(/* webpackChunkName: "notification" */ '../views/NotificationView.vue')
   }
+ 
 ]
 
 const router = createRouter({

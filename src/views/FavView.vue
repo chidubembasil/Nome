@@ -80,11 +80,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 import HeaderView from '../components/HeaderView.vue';
 import FooterView from '../components/FooterView.vue';
-import { Heart, Bed, Bathtub } from 'lucide-vue-next'; // Now importing card icons here
+import { Heart, Bed, Bathtub } from 'lucide-vue-next';
+import * as Ably from 'ably'; // ✅ Updated Ably import
+
 
 // --- Reactive State ---
 const properties = ref([]);
@@ -92,73 +94,89 @@ const loading = ref(true);
 const error = ref(null);
 const viewMode = ref('grid');
 
-// --- API Endpoint ---
 const API_URL = '/api/favorites'; 
 
-// --- Utility Functions (previously in PropertyCard) ---
+// --- Format currency utility ---
 const formatCurrency = (property) => {
-    const value = property.price;
-    const options = {
-        style: 'currency',
-        currency: 'NGN',
-        minimumFractionDigits: 0,
-    };
-    let formatted = new Intl.NumberFormat('en-US', options).format(value);
-    
-    if (property.isRent) {
-        formatted += '/mo';
-    }
-    return formatted;
+  const value = property.price;
+  const options = { style: 'currency', currency: 'NGN', minimumFractionDigits: 0 };
+  let formatted = new Intl.NumberFormat('en-US', options).format(value);
+  if (property.isRent) formatted += '/mo';
+  return formatted;
 };
 
+// --- Toggle favorite (placeholder) ---
 const toggleFavorite = (id) => {
-    // This is typically a PUT/POST request to change the favorite status
-    console.log(`Toggling favorite status for property ID: ${id}`);
-    
-    // In this specific Favorites page, clicking the heart often just un-favorites it,
-    // which would trigger the removeFavorite logic or a separate state change.
-    // For now, we'll log it, assuming 'removeFavorite' handles the actual deletion from the list.
+  console.log(`Toggling favorite: ${id}`);
 };
 
-
-// --- Data Fetching Function (Connected to Backend) ---
-const fetchProperties = async () => {
-    loading.value = true;
-    error.value = null;
-    try {
-        const response = await axios.get(API_URL);
-        
-        properties.value = response.data.map(p => ({
-            ...p,
-            isRent: p.type === 'rent', 
-            isFavorite: true // Assumed true as they are in the favorites list
-        }));
-
-    } catch (err) {
-        error.value = err;
-        console.error('Error fetching favorites:', err);
-    } finally {
-        loading.value = false;
-    }
-};
-
-// --- Remove Favorite Function (Connected to Backend) ---
+// --- Remove favorite ---
 const removeFavorite = async (id) => {
-    try {
-        await axios.delete(`${API_URL}/${id}`);
-        
-        // Optimistically remove from the local list after successful API call
-        properties.value = properties.value.filter(p => p.id !== id);
-        
-    } catch (err) {
-        console.error(`Error removing favorite ${id}:`, err);
-        alert(`Failed to remove property. Please try again.`);
-    }
+  try {
+    await axios.delete(`${API_URL}/${id}`);
+    properties.value = properties.value.filter(p => p.id !== id);
+  } catch (err) {
+    console.error(`Failed to remove ${id}`, err);
+    alert('Failed to remove property. Try again.');
+  }
 };
 
-// --- Lifecycle Hook ---
-onMounted(fetchProperties);
+// --- Fetch initial data ---
+const fetchProperties = async () => {
+  loading.value = true;
+  error.value = null;
+  try {
+    const response = await axios.get(API_URL);
+    properties.value = response.data.map(p => ({
+      ...p,
+      isRent: p.type === 'rent',
+      isFavorite: true
+    }));
+  } catch (err) {
+    error.value = err;
+    console.error('Error fetching favorites:', err);
+  } finally {
+    loading.value = false;
+  }
+};
+
+// --- ABLY REALTIME ---
+let ablyRealtime = null;
+let channel = null;
+
+onMounted(async () => {
+  await fetchProperties();
+
+  ablyRealtime = new Ably.Realtime({
+      key: 'RSTb1g.Dg9vCg:IYEo1Otd0e1OLvKynv_go5Ma3LvCEa2R1ln7KLwhRk8'
+    });
+    
+
+
+  channel = ablyRealtime.channels.get("favorites-updates");
+
+  channel.subscribe("update", (msg) => {
+    console.log("Received favorite update:", msg.data);
+
+    // Merge/update properties list
+    if (msg.data.action === 'remove') {
+      properties.value = properties.value.filter(p => p.id !== msg.data.id);
+    } else if (msg.data.action === 'update') {
+      properties.value = properties.value.map(p =>
+        p.id === msg.data.id ? { ...p, ...msg.data.payload } : p
+      );
+    }
+  });
+
+  console.log("Ably connected to favorites-updates channel");
+});
+
+onUnmounted(() => {
+  if (channel) channel.unsubscribe();
+  if (ablyRealtime) ablyRealtime.close();
+});
 </script>
+
 
 <style scoped>
 /* ========================================================= */

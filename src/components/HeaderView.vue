@@ -2,7 +2,7 @@
     import { Home, Menu, X, Heart, Sun, Moon } from 'lucide-vue-next' 
     import { ref, onMounted } from 'vue' // Import onMounted for initial theme check
     // Import User icon which was used in the template but not imported
-    import { User } from 'lucide-vue-next' 
+    import { User, Bell } from 'lucide-vue-next' 
 
     const headerHeight = ref('10dvh')
     const isSwitch = ref(false)
@@ -86,6 +86,9 @@
                     </button>
                 </li>
                 <li>
+                    <router-link to="/notification" class="icon" > <Bell size="17" id="bell" /></router-link>
+                </li>
+                <li>
                     <router-link to="/favorite" class="icon" > <Heart size="17" id="heart" /></router-link>
                 </li>
                 <li id="profile" ref="profile">
@@ -110,6 +113,7 @@
                 <li><router-link to="/create">Create</router-link></li>
                 <li><router-link to="/listing">Listing</router-link></li>
                 <li><router-link to="/favorite">Favorite</router-link></li>
+                <li><router-link to="/notification">Notification</router-link></li>
                 <li><router-link to="/about">About</router-link></li>
             
                 

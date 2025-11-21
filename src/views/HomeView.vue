@@ -74,129 +74,109 @@
   <FooterView/>
 </template>
 
+
 <script setup>
-  import {ref} from 'vue'
-  /* import { ref, onMounted } from 'vue'
-  import axios from 'axios' */
-  import HeaderView from '../components/HeaderView.vue'
-  import FooterView from '../components/FooterView.vue'
-  import { useRouter } from 'vue-router'
+  import { ref, onMounted, onUnmounted } from 'vue';
+  import axios from 'axios';
+  import * as Ably from 'ably'; // ✅ Updated Ably import
+  import HeaderView from '../components/HeaderView.vue';
+  import FooterView from '../components/FooterView.vue';
+  import { useRouter } from 'vue-router';
   import { Home, Sparkles, Shield, X } from 'lucide-vue-next';
 
-  const buyBtn = ref(null)
-  const rentBtn = ref(null)
-  const investBtn = ref(null)
-  const stayBtn = ref(null)
-  const searchBtn = ref(null)
-  const searchInput = ref(null)
-  const error = ref(null)
-  
-  
-  const router = useRouter()
+  // --- Refs ---
+  const buyBtn = ref(null);
+  const rentBtn = ref(null);
+  const investBtn = ref(null);
+  const stayBtn = ref(null);
+  const searchBtn = ref(null);
+  const searchInput = ref('');
+  const error = ref(null);
 
-  function buyBtnClick(){
-    buyBtn.value.style.backgroundColor = "var(--card)";
-    buyBtn.value.style.color = "var(--foreground)";
-    rentBtn.value.style.backgroundColor = "transparent";
-    rentBtn.value.style.color = "var(--foreground)";
-    investBtn.value.style.backgroundColor = "transparent";
-    investBtn.value.style.color = "var(--foreground)";
-    stayBtn.value.style.backgroundColor = "transparent";
-    stayBtn.value.style.color = "var(--foreground)";   
-  }
-  function rentBtnClick(){
-    buyBtn.value.style.backgroundColor = "transparent";
-    buyBtn.value.style.color = "var(foreground)";
-    rentBtn.value.style.backgroundColor = "var(--card)";
-    rentBtn.value.style.color = "var(--foreground)";  
-    investBtn.value.style.backgroundColor = "transparent";
-    investBtn.value.style.color = "var(--foreground)";
-    stayBtn.value.style.backgroundColor = "transparent";
-    stayBtn.value.style.color = "var(--foreground)";
-  }
-  function investBtnClick(){
-      buyBtn.value.style.backgroundColor = "transparent";
-      buyBtn.value.style.color = "var(--foreground)";
-      rentBtn.value.style.backgroundColor = "transparent";
-      rentBtn.value.style.color = "var(--foreground)";
-      investBtn.value.style.backgroundColor = "var(--card)";
-      investBtn.value.style.color = "var(--foreground)";  
-      stayBtn.value.style.backgroundColor = "transparent";
-      stayBtn.value.style.color = "var(--foreground)";
-      
-  }
-  function stayBtnClick(){
-      buyBtn.value.style.backgroundColor = "transparent";
-      buyBtn.value.style.color = "var(--foreground)";
-      rentBtn.value.style.backgroundColor = "transparent";
-      rentBtn.value.style.color = "var(--foreground)";
-      investBtn.value.style.backgroundColor = "transparent";
-      investBtn.value.style.color = "var(--foreground)";  
-      stayBtn.value.style.backgroundColor = "var(--card)";
-      stayBtn.value.style.color = "var(--foreground)";  
-      
-  }
-  function searchBtnClick(){
-      if (searchInput.value.trim() === "") {
-        setTimeout(()=>{
+  // --- Router ---
+  const router = useRouter();
 
-          error.value.style.display = "flex"
-         /*  const error = document.createElement('div')
-          
-          error.style.width = "200px"
-          error.style.height = "70px"
-          error.style.backgroundColor = "red";
-          error.style.position = 'absolute'
-          error.style.top = '12dvh'
-          error.style.right = '0'
-          error.style.zIndex = '10'
-          error.innerText = "Error" */
+  // --- Ably Realtime Setup ---
+  let ablyRealtime = null;
+  let channel = null;
 
+  onMounted(() => {
+    ablyRealtime = new Ably.Realtime({
+      key: 'RSTb1g.Dg9vCg:IYEo1Otd0e1OLvKynv_go5Ma3LvCEa2R1ln7KLwhRk8'
+    });
+    channel = ablyRealtime.channels.get('landingpage-events');
 
-        }, 100)
-        setTimeout(()=>{
+    // Subscribe to all events
+    channel.subscribe("button-click", msg => {
+      console.log("Button clicked:", msg.data);
+    });
 
-          error.value.style.display = "none"
-         /*  const error = document.createElement('div')
-          
-          error.style.width = "200px"
-          error.style.height = "70px"
-          error.style.backgroundColor = "red";
-          error.style.position = 'absolute'
-          error.style.top = '12dvh'
-          error.style.right = '0'
-          error.style.zIndex = '10'
-          error.innerText = "Error" */
+    channel.subscribe("search", msg => {
+      console.log("Search event:", msg.data);
+    });
+  });
 
+  onUnmounted(() => {
+    if (channel) channel.unsubscribe();
+    if (ablyRealtime) ablyRealtime.close();
+  });
 
-        }, 1000)
-        /* setImmediate() */
-        /* alert("Input field is required");  */ 
-      } else{
-        router.push('/listing') 
+  // --- Button click handlers ---
+  function highlightButton(activeBtn) {
+    const buttons = [buyBtn, rentBtn, investBtn, stayBtn];
+    buttons.forEach(btnRef => {
+      if (btnRef === activeBtn) {
+        btnRef.value.style.backgroundColor = "var(--card)";
+        btnRef.value.style.color = "var(--foreground)";
+      } else {
+        btnRef.value.style.backgroundColor = "transparent";
+        btnRef.value.style.color = "var(--foreground)";
       }
-
+    });
   }
 
-  /* onMounted(() => {
-    
-    const url = ""
-    axios.get(url)
-    .then((response) => {
+  function buyBtnClick() { highlightButton(buyBtn); publishButton("buy"); }
+  function rentBtnClick() { highlightButton(rentBtn); publishButton("rent"); }
+  function investBtnClick() { highlightButton(investBtn); publishButton("invest"); }
+  function stayBtnClick() { highlightButton(stayBtn); publishButton("stay"); }
 
-      
-   
-    })
-      
-    })
-    .catch((error) => {
-      console.log(error)
-    })
-  }) */
+  // --- Search handler ---
+  async function searchBtnClick() {
+    if (!searchInput.value.trim()) {
+      error.value.style.display = "flex";
+      setTimeout(() => (error.value.style.display = "none"), 1000);
+      return;
+    }
 
+    // Publish search event via Ably
+    publishSearch(searchInput.value);
 
+    // Example Axios search request
+    try {
+      const response = await axios.get(`/api/search?query=${encodeURIComponent(searchInput.value)}`);
+      console.log("Search results:", response.data);
 
+      // Navigate to listing page with results
+      router.push({ path: '/listing', query: { q: searchInput.value } });
+    } catch (err) {
+      console.error("Search failed:", err);
+    }
+  }
+
+  // --- Ably publishers ---
+  function publishButton(name) {
+    if (channel) channel.publish("button-click", { button: name });
+  }
+
+  function publishSearch(query) {
+    if (channel) channel.publish("search", { query });
+  }
 </script>
+
+
+
+
+
 <style scoped>
   #error{
     position: absolute;

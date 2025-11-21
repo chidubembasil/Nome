@@ -200,13 +200,14 @@
 </template>
 
 <script setup>
+
 import { ref, reactive, onMounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import * as Ably from 'ably'; // ✅ Updated import
 import { Heart, ChevronDown, Bed, Bath, Ruler, MapPin, Loader, AlertTriangle, PackageX, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import HeaderView from '../components/HeaderView.vue';
 import FooterView from '../components/FooterView.vue';
-
 
 // --- Reactive State ---
 const loading = ref(true);
@@ -216,12 +217,9 @@ const countries = ref([]);
 
 // --- Pagination State ---
 const currentPage = ref(1);
-const itemsPerPage = ref(12); // Define how many properties you want per page
-const totalProperties = ref(0); // Total number of properties matching filters
-const totalPages = computed(() => {
-    // Calculate total pages based on total items and items per page
-    return Math.ceil(totalProperties.value / itemsPerPage.value);
-});
+const itemsPerPage = ref(12);
+const totalProperties = ref(0);
+const totalPages = computed(() => Math.ceil(totalProperties.value / itemsPerPage.value));
 
 const router = useRouter();
 
@@ -235,6 +233,24 @@ const filters = reactive({
     sortBy: 'featured',
 });
 
+// --- Ably Realtime Setup ---
+const ablyRealtime = new Ably.Realtime({ key: 'RSTb1g.Dg9vCg:IYEo1Otd0e1OLvKynv_go5Ma3LvCEa2R1ln7KLwhRk8' });
+const channel = ablyRealtime.channels.get('property-updates');
+
+// Subscribe to real-time property updates
+channel.subscribe('update', (msg) => {
+    const updatedProperty = msg.data;
+    const index = properties.value.findIndex(p => p.id === updatedProperty.id);
+    if (index !== -1) {
+        // Update existing property
+        properties.value[index] = { ...properties.value[index], ...updatedProperty };
+    } else {
+        // Add new property
+        properties.value.unshift(updatedProperty);
+        totalProperties.value += 1; // Update total properties count
+    }
+});
+
 // --- API Endpoints ---
 const LISTINGS_API_URL = '/api/listings';
 const COUNTRIES_API_URL = '/api/countries';
@@ -246,40 +262,7 @@ async function fetchCountries() {
         countries.value = response.data;
     } catch (err) {
         console.error('Failed to fetch countries:', err);
-        // Fallback data if API fails
-        countries.value = [
-            'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina',
-            'Armenia', 'Australia', 'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh',
-            'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan', 'Bolivia',
-            'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei', 'Bulgaria', 'Burkina Faso',
-            'Burundi', 'Cabo Verde', 'Cambodia', 'Cameroon', 'Canada', 'Central African Republic',
-            'Chad', 'Chile', 'China', 'Colombia', 'Comoros', 'Congo (Congo-Brazzaville)',
-            'Costa Rica', 'Croatia', 'Cuba', 'Cyprus', 'Czech Republic', 'Democratic Republic of the Congo',
-            'Denmark', 'Djibouti', 'Dominica', 'Dominican Republic', 'Ecuador', 'Egypt',
-            'El Salvador', 'Equatorial Guinea', 'Eritrea', 'Estonia', 'Eswatini', 'Ethiopia',
-            'Fiji', 'Finland', 'France', 'Gabon', 'Gambia', 'Georgia', 'Germany', 'Ghana',
-            'Greece', 'Grenada', 'Guatemala', 'Guinea', 'Guinea-Bissau', 'Guyana', 'Haiti',
-            'Honduras', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland',
-            'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya', 'Kiribati',
-            'Kuwait', 'Kyrgyzstan', 'Laos', 'Latvia', 'Lebanon', 'Lesotho', 'Liberia', 'Libya',
-            'Liechtenstein', 'Lithuania', 'Luxembourg', 'Madagascar', 'Malawi', 'Malaysia',
-            'Maldives', 'Mali', 'Malta', 'Marshall Islands', 'Mauritania', 'Mauritius', 'Mexico',
-            'Micronesia', 'Moldova', 'Monaco', 'Mongolia', 'Montenegro', 'Morocco',
-            'Mozambique', 'Myanmar', 'Namibia', 'Nauru', 'Nepal', 'Netherlands', 'New Zealand',
-            'Nicaragua', 'Niger', 'Nigeria', 'North Korea', 'North Macedonia', 'Norway',
-            'Oman', 'Pakistan', 'Palau', 'Panama', 'Papua New Guinea', 'Paraguay', 'Peru',
-            'Philippines', 'Poland', 'Portugal', 'Qatar', 'Romania', 'Russia', 'Rwanda',
-            'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines',
-            'Samoa', 'San Marino', 'Sao Tome and Principe', 'Saudi Arabia', 'Senegal',
-            'Serbia', 'Seychelles', 'Sierra Leone', 'Singapore', 'Slovakia', 'Slovenia',
-            'Solomon Islands', 'Somalia', 'South Africa', 'South Korea', 'South Sudan',
-            'Spain', 'Sri Lanka', 'Sudan', 'Suriname', 'Sweden', 'Switzerland', 'Syria',
-            'Taiwan', 'Tajikistan', 'Tanzania', 'Thailand', 'Timor-Leste', 'Togo', 'Tonga',
-            'Trinidad and Tobago', 'Tunisia', 'Turkey', 'Turkmenistan', 'Tuvalu', 'Uganda',
-            'Ukraine', 'United Arab Emirates', 'United Kingdom', 'United States', 'Uruguay',
-            'Uzbekistan', 'Vanuatu', 'Vatican City', 'Venezuela', 'Vietnam', 'Yemen',
-            'Zambia', 'Zimbabwe',
-        ];
+        countries.value = ['Nigeria', 'USA', 'UK']; // fallback
     }
 }
 
@@ -295,23 +278,19 @@ async function fetchProperties() {
         bedrooms: filters.bed,
         bathrooms: filters.bath,
         sort_by: filters.sortBy,
-        // PAGINATION PARAMETERS sent to the backend
         page: currentPage.value,
         limit: itemsPerPage.value,
     };
 
     try {
         const response = await axios.get(LISTINGS_API_URL, { params });
-        
-        // **IMPORTANT:** Assumes backend returns an object with 'data' and 'total' properties.
-        const apiData = response.data; 
-
+        const apiData = response.data;
         properties.value = apiData.data.map(p => ({
             id: p.id,
-            name: p.title || p.name, 
-            type: p.property_type || 'Buy', 
+            name: p.title || p.name,
+            type: p.property_type || 'Buy',
             featured: p.is_featured || false,
-            price: p.price_formatted || `$${p.price.toLocaleString()}`, 
+            price: p.price_formatted || `$${p.price.toLocaleString()}`,
             period: p.rent_period,
             location: p.city_state,
             beds: p.num_beds,
@@ -319,10 +298,7 @@ async function fetchProperties() {
             size: p.area_sqft,
             image: p.main_image_url,
         }));
-        
-        // Update the total count for pagination calculation
-        totalProperties.value = apiData.total; 
-
+        totalProperties.value = apiData.total;
     } catch (err) {
         console.error('Failed to fetch properties:', err);
         error.value = 'Failed to fetch properties.';
@@ -335,36 +311,18 @@ async function fetchProperties() {
 
 function navigatePage(property) {
     let routeName;
-    
-    const type = property.type.toLowerCase();
-
-    switch (type) {
-        case 'stay':
-            routeName = 'StayDetails';
-            break;
-        case 'invest':
-            routeName = 'InvestDetails';
-            break;
-        case 'buy':
-            routeName = 'BuyDetails';
-            break;
-        case 'rent':
-            routeName = 'RentDetails';
-            break;
-        default:
-            routeName = 'PropertyDetails'; 
-            console.warn(`Unknown property type: ${type}. Falling back to general details page.`);
-            break;
+    switch (property.type.toLowerCase()) {
+        case 'stay': routeName = 'StayDetails'; break;
+        case 'invest': routeName = 'InvestDetails'; break;
+        case 'buy': routeName = 'BuyDetails'; break;
+        case 'rent': routeName = 'RentDetails'; break;
+        default: routeName = 'PropertyDetails';
     }
-
-    router.push({ 
-        name: routeName, 
-        params: { id: property.id } 
-    });
+    router.push({ name: routeName, params: { id: property.id } });
 }
 
 function applyFilters() {
-    currentPage.value = 1; // Always reset to page 1 on new filter application
+    currentPage.value = 1;
     fetchProperties();
 }
 
@@ -378,34 +336,30 @@ function clearFilters() {
         bath: 'any',
         sortBy: 'featured',
     });
-    currentPage.value = 1; // Reset page on clear
+    currentPage.value = 1;
     fetchProperties();
 }
 
-/**
- * Handles changing the current page and fetching new data.
- * @param {number} page The page number to navigate to.
- */
 function changePage(page) {
     if (page >= 1 && page <= totalPages.value && page !== currentPage.value) {
         currentPage.value = page;
         fetchProperties();
-        // Scroll to the top of the content area for better UX
         window.scrollTo({ top: 300, behavior: 'smooth' });
     }
 }
 
-// --- Lifecycle & Watchers ---
+// Lifecycle & Watchers
 onMounted(() => {
     fetchCountries();
     fetchProperties();
 });
 
 watch(() => filters.sortBy, () => {
-    currentPage.value = 1; // Reset page when sort order changes
+    currentPage.value = 1;
     fetchProperties();
 });
 </script>
+
 
 <style scoped>
 .property-listings-page {

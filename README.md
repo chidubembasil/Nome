@@ -1,4 +1,4 @@
-# tripp
+# nome
 
 ## Project setup
 ```
