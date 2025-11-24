@@ -1,5 +1,6 @@
 <template>
     <footer>
+        <NessaAi/>
         <div id="footer1">
             <ul>
                 <h3><Home color="var(--primary)"/>Nomes</h3>
@@ -14,6 +15,9 @@
                 </li>
                  <li>
                     <router-link to="/listing" class="router">Listing</router-link>
+                </li>
+                <li>
+                    <router-link to="/feed" class="router">News feed</router-link>
                 </li>
                  <li>
                     <router-link to="/about" class="router">About</router-link>
@@ -30,6 +34,9 @@
                 </li>
                  <li>
                     <router-link to="/payment" class="router">Payment</router-link>
+                </li>
+                 <li>
+                    <router-link to="/notification" class="router">Notification</router-link>
                 </li>
                
             </ul>
@@ -57,6 +64,7 @@
 </template>
 <script setup >
 import { Home } from 'lucide-vue-next';
+import NessaAi from '../components/NessaAi.vue'
 
 </script>
 

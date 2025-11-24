@@ -76,6 +76,11 @@ const routes = [
     path: '/notification',
     name: 'notification',
     component: () => import(/* webpackChunkName: "notification" */ '../views/NotificationView.vue')
+  },
+  {
+    path: '/forget',
+    name: 'forget',
+    component: () => import(/* webpackChunkName: "forget" */ '../views/ForgetPassword.vue')
   }
  
 ]

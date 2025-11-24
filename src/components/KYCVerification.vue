@@ -5,102 +5,111 @@
 
 
   const kycData = reactive({
-    verificationStatus: 'Not Verified',
-    isVerified: false,
-    // Legal & Identity
-    ageLegal: false,
-    dateOfBirth: '',
-    ssnOrTaxID: '',
-    idNumber: '',
-    uploadGovIDFront: null,
-    uploadGovIDBack: null,
-    selfieWithID: null,
-    // Property Insurance
-    propertyInsurance: null,
-    // Financial Verification
-    bankName: '',
-    accountType: 'Checking',
-    bankStatement: null,
-    proofOfFunds: null,
-    // Address Verification
-    residenceAddress: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    proofOfAddress: null,
-    // Business Entity
-    legalCompanyName: '',
-    ein: '',
-    entityType: 'LLC',
-    articlesOfIncorporation: null,
-    operatingAgreement: null,
+  verificationStatus: 'Not Verified',
+  isVerified: false,
+  // Legal & Identity
+  ageLegal: false,
+  dateOfBirth: '',
+  ssnOrTaxID: '',
+  idNumber: '',
+  uploadGovIDFront: null,
+  uploadGovIDBack: null,
+  selfieWithID: null,
+  // Property Insurance
+  propertyInsurance: null,
+  // Financial Verification
+  bankName: '',
+  accountType: 'Checking',
+  bankStatement: null,
+  proofOfFunds: null,
+  // Address Verification
+  residenceAddress: '',
+  city: '',
+  state: '',
+  zipCode: '',
+  proofOfAddress: null,
+  // Business Entity
+  legalCompanyName: '',
+  ein: '',
+  entityType: 'LLC',
+  articlesOfIncorporation: null,
+  operatingAgreement: null,
+});
+
+let ablyRealtime = null;
+let channel = null;
+const ablyStatus = ref('');
+const uploadProgress = ref(0);
+const isSubmitting = ref(false);
+
+onMounted(() => {
+  ablyRealtime = new Ably.Realtime({
+      key: 'RSTb1g.Dg9vCg:IYEo1Otd0e1OLvKynv_go5Ma3LvCEa2R1ln7KLwhRk8'
   });
+  channel = ablyRealtime.channels.get('kyc-updates');
 
-  // Ably setup
-  let ablyRealtime = null;
-  let channel = null;
-  const ablyStatus = ref('');
-
-  onMounted(() => {
-    ablyRealtime = new Ably.Realtime({
-        key: 'RSTb1g.Dg9vCg:IYEo1Otd0e1OLvKynv_go5Ma3LvCEa2R1ln7KLwhRk8'
-    });
-    channel = ablyRealtime.channels.get('kyc-updates');
-
-    // Subscribe to verification status updates
-    channel.subscribe('status-update', (msg) => {
-      if (msg.data?.status) {
-        kycData.verificationStatus = msg.data.status;
-        ablyStatus.value = `Received update: ${msg.data.status}`;
-      }
-    });
-  });
-
-  onUnmounted(() => {
-    if (channel) channel.unsubscribe();
-    if (ablyRealtime) ablyRealtime.close();
-  });
-
-  // File upload handler
-  const handleFileUpload = (event, field) => {
-    const file = event.target.files[0];
-    if (file) kycData[field] = file;
-  };
-
-  // Submit KYC
-  const submitVerification = async () => {
-    try {
-      // Prepare form data
-      const formData = new FormData();
-      for (const key in kycData) {
-        if (kycData[key] instanceof File) {
-          formData.append(key, kycData[key]);
-        } else {
-          formData.append(key, kycData[key]);
-        }
-      }
-
-      kycData.verificationStatus = 'Pending Review';
-      ablyStatus.value = 'Submitting KYC data...';
-
-      // Send to backend
-      const response = await axios.post('/api/kyc/submit', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-
-      console.log('Server response:', response.data);
-
-      // Publish event to Ably
-      if (channel) {
-        channel.publish('kyc-submitted', { userId: response.data.userId || 'anonymous' });
-      }
-
-      alert('KYC submitted successfully. You will receive real-time updates.');
-    } catch (err) {
-      console.error('KYC submission failed:', err);
-      alert('Failed to submit KYC. Please try again.');
+  // Subscribe to verification status updates
+  channel.subscribe('status-update', (msg) => {
+    if (msg.data?.status) {
+      kycData.verificationStatus = msg.data.status;
+      ablyStatus.value = `Received update: ${msg.data.status}`;
     }
-  };
+  });
+});
+
+onUnmounted(() => {
+  if (channel) channel.unsubscribe();
+  if (ablyRealtime) ablyRealtime.close();
+});
+
+// File upload handler
+const handleFileUpload = (event, field) => {
+  const file = event.target.files[0];
+  if (file) kycData[field] = file;
+};
+
+// Submit KYC with progress tracking
+const submitVerification = async () => {
+  try {
+    isSubmitting.value = true;
+    uploadProgress.value = 0;
+
+    const formData = new FormData();
+    for (const key in kycData) {
+      if (kycData[key] instanceof File) {
+        formData.append(key, kycData[key]);
+      } else {
+        formData.append(key, kycData[key]);
+      }
+    }
+
+    kycData.verificationStatus = 'Pending Review';
+    ablyStatus.value = 'Submitting KYC data...';
+
+    const response = await axios.post('/api/kyc/submit', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: (progressEvent) => {
+        uploadProgress.value = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+      }
+    });
+
+    console.log('Server response:', response.data);
+
+    // Publish event to Ably
+    if (channel) {
+      channel.publish('kyc-submitted', { userId: response.data.userId || 'anonymous' });
+    }
+
+    kycData.verificationStatus = response.data.status || 'Pending Review';
+    alert('KYC submitted successfully. You will receive real-time updates.');
+  } catch (err) {
+    console.error('KYC submission failed:', err);
+    alert(err.response?.data?.message || 'Failed to submit KYC. Please try again.');
+  } finally {
+    isSubmitting.value = false;
+    uploadProgress.value = 0;
+  }
+};
 </script>
 
 
@@ -140,7 +149,7 @@
             <input id="ssnOrTaxID" v-model="kycData.ssnOrTaxID" type="text" placeholder="XXX-XX-XXXX" required class="text-input">
           </div>
           <div class="form-group full-width">
-            <label for="idNumber">ID Number</label>
+            <label for="idNumber">ID Number / NIN / Passport Number</label>
             <input id="idNumber" v-model="kycData.idNumber" type="text" placeholder="Enter ID number" required class="text-input">
           </div>
         </div>

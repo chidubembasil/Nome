@@ -95,7 +95,7 @@
                     <router-link to="/profile" class="icon"><User size="17" id="user" /></router-link>
                 </li>
                 <li>
-                    <router-link to="/auth" id="joinBtn"> <User size="17" id="userBtn" /> Join</router-link>
+                    <router-link to="/auth" id="joinBtn" style="color: #ffffff"> <User size="17" id="userBtn" /> Join</router-link>
                 </li>
             </ul>
             <button id="menuBtn" v-if="!isSwitch" @click="toggleMenu">

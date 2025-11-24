@@ -42,10 +42,10 @@
           <Sparkles color="var(--accent)"/>
         </span>
         <h3>
-          AI Matching
+          AI Assistant
         </h3>
         <p>
-          Your data and transactions are protected with bank-level security
+          Your smart AI assistant for property recommendations and insights
         </p>
       </div>
       <div class="ctaDiv" >
@@ -61,14 +61,18 @@
       </div>
        
     </div>
-    <div id="featured" >
-      <div id="text">
-
+   <!--  <div id="featured" >
+      <div id="textDiv">
+        <div id="text">
+          <h2>Featured Properties</h2>
+          <p>Handpicked properties just for you</p>
+        </div>
+        <router-link to="/listing" class="view-all-link">View All </router-link>
       </div>
       <div id="featuredItems" ref="featuredItems">
-
+        
       </div>
-    </div>
+    </div> -->
 
   </main>
   <FooterView/>

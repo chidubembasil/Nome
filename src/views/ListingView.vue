@@ -137,7 +137,7 @@
                                     </div>
                                     <div class="card-content">
                                         <h3 class="property-name">{{ property.name }}</h3>
-                                        <p class="property-price">{{ property.price }}<span v-if="property.period"> /{{ property.period }}</span></p>
+                                        <p class="property-price">{{ property.currency}}  {{ property.price }}<span v-if="property.period"> /{{ property.period }}</span></p>
                                         <p class="property-location">
                                             <MapPin :size="16" class="icon-detail" />
                                             {{ property.location }}

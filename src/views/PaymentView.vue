@@ -136,7 +136,7 @@ const isOrderLoaded = computed(() => orderSummary.propertyPrice > 0 && !loadingO
 
 // --- Currency Conversion ---
 const availableCurrencies = [
-    'USD','EUR','GBP','CAD','XAF','COP','EGP','GHS','KES','IRN','NGN','RWF','SLL','ZAR','TZS','UGX','XOF','ZMW'
+    'USD','EUR','GBP','CAD','NGN','ZAR'
 ];
 const selectedCurrency = ref('NGN'); 
 const conversionRate = ref(0); 

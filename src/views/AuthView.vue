@@ -26,7 +26,8 @@
                     <label class="remember-me">
                         <input type="checkbox"> Remember me
                     </label>
-                    <a href="#" class="forgot-link">Forgot password?</a>
+                    <router-link to="/forget" class="forgot-link">Forgot password?</router-link>
+                    <!-- <a href="#" class="forgot-link">Forgot password?</a> -->
                 </div>
                 
                 <button type="submit" class="btn btn-primary sign-in-btn">Sign In</button>

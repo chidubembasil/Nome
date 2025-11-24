@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from 'vue';
 import ProfileInfo from '../components/ProfileInfo.vue';
-import NotificationPreferences from '../components/NotificationPreferences.vue';
 import Security from '../components/SecurityView.vue';
 import KYCVerification from '../components/KYCVerification.vue';
 import MyListings from '../components/MyListings.vue';
@@ -11,7 +10,6 @@ const currentTab = ref('personal-info');
 
 const tabs = [
   { id: 'personal-info', label: 'Personal Info', component: ProfileInfo },
-  { id: 'preferences', label: 'Preferences', component: NotificationPreferences },
   { id: 'security', label: 'Security', component: Security },
   { id: 'kyc-verification', label: 'KYC Verification', component: KYCVerification },
   { id: 'my-listings', label: 'My Listings', component: MyListings },
