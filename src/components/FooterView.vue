@@ -3,8 +3,8 @@
         <NessaAi/>
         <div id="footer1">
             <ul>
-                <h3><Home color="var(--primary)"/>Zipsleepers</h3>
-                <li>Your Property Journey Starts Here. Buy, Rent, <br> Invest — All in one Zipsleeper.</li>
+                <h3><Home color="var(--primary)"/>Scillars</h3>
+                <li>Your Property Journey Starts Here. Buy, Rent, <br> Invest — All in one Scillar.</li>
                 
             </ul>
            
@@ -58,7 +58,7 @@
              
         </div>
         <div id="footer2">
-            &copy; 2025 Zipsleeper Real Estate. All rights reserved.
+            &copy; 2025 Scillar Real Estate. All rights reserved.
         </div>
     </footer>
 </template>

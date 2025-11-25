@@ -5,12 +5,12 @@ import FooterView from '../components/FooterView.vue'
 
 const faqs = reactive([
   {
-    question: "How do I list my property on zipsleeper?",
+    question: "How do I list my property on Scillar?",
     answer: "Navigate to the 'Listings' tab and click 'List Your Property'. Fill out the required information regarding property details, location, and upload high-quality images. Once submitted, our team will review it before publishing.",
     isOpen: false
   },
   {
-    question: "Is there a fee to use zipsleeper?",
+    question: "Is there a fee to use Scillar?",
     answer: "Listing a property is generally free. We charge a small transaction fee only upon successful sale or lease, which is clearly outlined in our terms of service.",
     isOpen: false
   },
@@ -25,8 +25,8 @@ const faqs = reactive([
     isOpen: false
   },
   {
-    question: "What makes zipsleeper different from other real estate platforms?",
-    answer: "zipsleeper combines cutting-edge technology with personalized service, offering AI-powered insights, seamless KYC verification, and a focus on secure, transparent transactions.",
+    question: "What makes Scillar different from other real estate platforms?",
+    answer: "Scillar combines cutting-edge technology with personalized service, offering AI-powered insights, seamless KYC verification, and a focus on secure, transparent transactions.",
     isOpen: false
   },
 ]);
@@ -56,7 +56,7 @@ const sendMessage = () => {
 <template>
   <HeaderView/>
   <div class="about-page-container">
-    <h1 class="page-title">About Zipsleeper</h1>
+    <h1 class="page-title">About Scillar</h1>
     <p class="mission-statement">
       We're on a mission to make real estate simple, transparent, and accessible for everyone
     </p>
@@ -83,13 +83,13 @@ const sendMessage = () => {
 
     <div class="narrative-section">
       <p>
-        Founded in 2025, Zipsleeper has revolutionized the real estate market by combining cutting-edge technology with personalized service. We believe that finding your dream property should be exciting, not stressful. Whether you're buying your first home, looking for an investment opportunity, or searching for the perfect rental, we're here to make your property journey seamless.
+        Founded in 2025, Scillar has revolutionized the real estate market by combining cutting-edge technology with personalized service. We believe that finding your dream property should be exciting, not stressful. Whether you're buying your first home, looking for an investment opportunity, or searching for the perfect rental, we're here to make your property journey seamless.
       </p>
     </div>
     
     <div class="faq-section">
         <h2 class="faq-title">Frequently Asked Questions</h2>
-        <p class="faq-subtitle">Find answers to common questions about using Zipsleeper</p>
+        <p class="faq-subtitle">Find answers to common questions about using Scillar</p>
         
         <div class="faq-list">
           <div v-for="(faq, index) in faqs" :key="index" class="faq-item">
@@ -139,8 +139,8 @@ const sendMessage = () => {
                     </div>
                     <div class="card-content">
                         <h4 class="card-subtitle">Email Us</h4>
-                        <p class="card-text">info@zipsleeper.com</p>
-                        <p class="card-text">support@zipsleeper.com</p>
+                        <p class="card-text">info@Scillar.com</p>
+                        <p class="card-text">support@Scillar.com</p>
                     </div>
                 </div>
                 
