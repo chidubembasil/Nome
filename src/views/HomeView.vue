@@ -9,7 +9,7 @@
   <main>
     <div id="landingPage">
       <h1>Find it. Try it. <span style="color: var(--primary)">Buy it.</span> Together.</h1>
-      <p>Buy, Rent, Invest, Stay — All in one Nome</p>
+      <p>Buy, Rent, Invest, Stay — All in one Zipsleeper</p>
       <form action="" method="post">
         <div id="btns">
           <button type="button" id="buy" ref="buyBtn" @click="buyBtnClick">Buy</button>

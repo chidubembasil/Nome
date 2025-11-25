@@ -3,8 +3,8 @@
         <NessaAi/>
         <div id="footer1">
             <ul>
-                <h3><Home color="var(--primary)"/>Nomes</h3>
-                <li>Your Property Journey Starts Here. Buy, Rent, <br> Invest — All in one Nome.</li>
+                <h3><Home color="var(--primary)"/>Zipsleepers</h3>
+                <li>Your Property Journey Starts Here. Buy, Rent, <br> Invest — All in one Zipsleeper.</li>
                 
             </ul>
            
@@ -58,7 +58,7 @@
              
         </div>
         <div id="footer2">
-            &copy; 2025 Nome Real Estate. All rights reserved.
+            &copy; 2025 Zipsleeper Real Estate. All rights reserved.
         </div>
     </footer>
 </template>

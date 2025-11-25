@@ -7,7 +7,7 @@
 
     <div class="login-page">
         <div class="login-box">
-            <Home :size="40" class="Nome-icon" />
+            <Home :size="40" class="Zipsleeper-icon" />
             <h2 class="title">Welcome Back</h2>
             <p class="subtitle">Sign in to continue your property journey</p>
             
@@ -107,7 +107,7 @@ const googleLogin = async () => {
     });
 
     // Store user in frontend
-    localStorage.setItem("Nome_user", JSON.stringify(user));
+    localStorage.setItem("Zipsleeper_user", JSON.stringify(user));
 
     window.location.href = "/profile";
 
@@ -168,7 +168,7 @@ const showError = (msg) => {
   color: var(--card-foreground);
 }
 
-.Nome-icon {
+.Zipsleeper-icon {
     color: var(--primary); 
     margin-bottom: 10px;
 }

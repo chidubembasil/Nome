@@ -56,7 +56,7 @@
         <div id="large">
             <router-link to="/" id="logo">
                 <Home/>
-                <h2>Nomes</h2>
+                <h2>Zipsleeper</h2>
             </router-link>
             <ul id="nav">
                 <li>
