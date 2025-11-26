@@ -213,7 +213,7 @@
       height: 90dvh;
       background: url('../assets/img/pexels-elly-fairytale-3807362.jpg');
       background-size: cover;
-      background-position: center;
+      background-position: top;
       background-repeat: no-repeat;
       background-attachment: fixed;
       display: flex;
@@ -380,6 +380,10 @@
   @media(max-width: 600px){
     main{
       #landingPage{
+         background: url('../assets/img/pexels-elly-fairytale-3807362.jpg');
+         background-size: cover;
+         background-position: 70% 50%;
+       
         h1{
           font-size: 1.3rem;
           text-align: center;

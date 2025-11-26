@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import axios from 'axios';
 
 const routes = [
   {
@@ -90,4 +91,28 @@ const router = createRouter({
   routes
 })
 
-export default router
+
+// Global guard
+let firstCheckDone = false;
+
+router.beforeEach(async (to, from, next) => {
+  if (!firstCheckDone) {
+    firstCheckDone = true;
+    try {
+      const res = await axios.get('/api/check-session.php');
+      const loggedIn = res.data.loggedIn;
+
+      if (!loggedIn && to.name !== 'auth') {
+        return next({ name: 'auth' });
+      } else if (loggedIn && to.name === 'auth') {
+        return next({ name: 'home' });
+      }
+    } catch (err) {
+      console.error('Session check failed', err);
+    }
+  }
+  next();
+});
+
+export default router;
+

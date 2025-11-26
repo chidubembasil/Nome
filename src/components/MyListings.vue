@@ -143,7 +143,7 @@ const editListing = (id) => {
     <div class="my-listings-component">
         <header class="listings-header">
             <h2>Your Property Listings</h2>
-            <button class="add-listing-btn" @click="editListing(null)">+ List New Property</button>
+            <router-link to="/create" class="add-listing-btn" @click="editListing(null)">+ List New Property</router-link> 
         </header>
         
         <nav class="tabs-nav">

@@ -3,7 +3,15 @@
         <NessaAi/>
         <div id="footer1">
             <ul>
-                <h3><Home color="var(--primary)"/>Scillars</h3>
+                <h3>
+                    <svg width="30" height="30" viewBox="0 0 100 100">
+                        <!-- Left half: #1637cc -->
+                        <polygon points="50,10 10,35 10,75 50,100 50,55 50,10" fill="#1637cc"/>
+                        <!-- Right half: #1a4fff -->
+                        <polygon points="50,10 90,35 90,75 50,100 50,55 50,10" fill="#1a4fff"/>
+                    </svg>
+                    Scillars
+                </h3>
                 <li>Your Property Journey Starts Here. Buy, Rent, <br> Invest — All in one Scillar.</li>
                 
             </ul>
@@ -63,7 +71,7 @@
     </footer>
 </template>
 <script setup >
-import { Home } from 'lucide-vue-next';
+// import { Home } from 'lucide-vue-next';
 import NessaAi from '../components/NessaAi.vue'
 
 </script>

@@ -7,7 +7,12 @@
 
     <div class="login-page">
         <div class="login-box">
-            <Home :size="40" class="Zipsleeper-icon" />
+           <svg width="30" height="30" viewBox="0 0 100 100">
+                    <!-- Left half: #1637cc -->
+                    <polygon points="50,10 10,35 10,75 50,100 50,55 50,10" fill="#1637cc"/>
+                    <!-- Right half: #1a4fff -->
+                    <polygon points="50,10 90,35 90,75 50,100 50,55 50,10" fill="#1a4fff"/>
+                </svg>
             <h2 class="title">Welcome Back</h2>
             <p class="subtitle">Sign in to continue your property journey</p>
             
@@ -50,7 +55,7 @@
 <script setup>
 import { ref } from 'vue';
 import axios from 'axios';
-import { Home, Mail, Lock, Google } from 'lucide-vue-next';
+import { Mail, Lock, Google } from 'lucide-vue-next';
 import HeaderView from '../components/HeaderView.vue'
 import FooterView from '../components/FooterView.vue'
 
@@ -72,7 +77,7 @@ const handleLogin = async () => {
   }
 
   try {
-    const response = await axios.post('YOUR_LOGIN_API.php', {
+    const response = await axios.post('https://zipsleeper.gt.tc/api/auth.php', {
       email: email.value,
       password: password.value
     });
@@ -80,7 +85,7 @@ const handleLogin = async () => {
     console.log('Login Successful:', response.data);
 
     // Redirect after login
-    window.location.href = "/profile";
+    window.location.href = "/";
 
   } catch (err) {
     showError("Invalid email or password");
@@ -98,7 +103,7 @@ const googleLogin = async () => {
     console.log("Google Login:", user);
 
     // SEND TO PHP BACKEND
-    await axios.post("https://your-backend.com/google-login.php", {
+    await axios.post('https://zipsleeper.gt.tc/api/auth.php', {
       uid: user.uid,
       name: user.displayName,
       email: user.email,
@@ -109,7 +114,7 @@ const googleLogin = async () => {
     // Store user in frontend
     localStorage.setItem("Zipsleeper_user", JSON.stringify(user));
 
-    window.location.href = "/profile";
+    window.location.href = "/";
 
   } catch (err) {
     showError("Google login failed");

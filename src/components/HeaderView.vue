@@ -1,5 +1,5 @@
 <script setup >
-    import { Home, Menu, X, Heart, Sun, Moon } from 'lucide-vue-next' 
+    import { Menu, X, Heart, Sun, Moon } from 'lucide-vue-next' 
     import { ref, onMounted } from 'vue' // Import onMounted for initial theme check
     // Import User icon which was used in the template but not imported
     import { User, Bell } from 'lucide-vue-next' 
@@ -55,7 +55,12 @@
     <header class="glass" ref="header" :style="{ height: headerHeight }">
         <div id="large">
             <router-link to="/" id="logo">
-                <Home/>
+                <svg width="30" height="30" viewBox="0 0 100 100">
+                    <!-- Left half: #1637cc -->
+                    <polygon points="50,10 10,35 10,75 50,100 50,55 50,10" fill="#1637cc"/>
+                    <!-- Right half: #1a4fff -->
+                    <polygon points="50,10 90,35 90,75 50,100 50,55 50,10" fill="#1a4fff"/>
+                </svg>
                 <h2>Scillar</h2>
             </router-link>
             <ul id="nav">
@@ -94,9 +99,9 @@
                 <li id="profile" ref="profile">
                     <router-link to="/profile" class="icon"><User size="17" id="user" /></router-link>
                 </li>
-                <li>
+                <!-- <li>
                     <router-link to="/auth" id="joinBtn" style="color: #ffffff"> <User size="17" id="userBtn" /> Join</router-link>
-                </li>
+                </li> -->
             </ul>
             <button id="menuBtn" v-if="!isSwitch" @click="toggleMenu">
                 <Menu size="17" id="menu" />
@@ -114,14 +119,12 @@
                 <li><router-link to="/listing">Listing</router-link></li>
                 <li><router-link to="/favorite">Favorite</router-link></li>
                 <li><router-link to="/notification">Notification</router-link></li>
-                <li><router-link to="/about">About</router-link></li>
-            
-                
-                <li><router-link to="/profile">Profile</router-link></li> <li><router-link to="/auth">Join</router-link></li>
+                <li><router-link to="/about">About</router-link></li>                
+                <li><router-link to="/profile">Profile</router-link></li> 
                 <li>
                     <button @click="toggleTheme" class="mobile-theme-toggle">
-                        <span v-if="!isDarkMode">Switch to Dark Mode <Moon size="17" style="margin-left: 5px;"/></span>
-                        <span v-else>Switch to Light Mode <Sun size="17" style="margin-left: 5px;"/></span>
+                        <span v-if="!isDarkMode">Dark Mode <Moon size="17" style="margin-left: 5px;"/></span>
+                        <span v-else>Light Mode <Sun size="17" style="margin-left: 5px;"/></span>
                     </button>
                 </li>
             </ul>
@@ -161,7 +164,7 @@
             #logo{
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.3rem;
             color:var(--logo    );
             text-decoration: none;
         }
@@ -217,10 +220,10 @@
                     color: var(--accent-foreground);
                 }
             }
-            #profile{
-                /* The User icon was not imported in the script, I have added it now */
+            /*#profile{
+                 
                 display: none;
-            }
+            }*/
             #joinBtn{
                 display: flex;
                 align-items: center;
@@ -329,8 +332,10 @@
                         cursor: pointer;
                     }
                     button.mobile-theme-toggle:hover {
-                         border-radius: 5px;
-                         background-color: var(--border);
+                        border-radius: 5px;
+                        background-color: var(--border);
+                        display: flex;
+                        align-items: center;
                     }
                 }
             }
